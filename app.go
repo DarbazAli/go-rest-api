@@ -1,31 +1,33 @@
 package main
 
 import (
-	"log"
+	"os"
+	"os/exec"
 
-	"github.com/firebase007/go-rest-api-with-fiber/database"
-	"github.com/firebase007/go-rest-api-with-fiber/router"
-	"github.com/gofiber/fiber" // import the fiber package
-	"github.com/gofiber/fiber/middleware"
-
-	_ "github.com/lib/pq"
+	"github.com/gofiber/fiber"
 )
 
-// Endtry point to begin program execution
 func main() {
 
-	// Connect to database
-	if err := database.Connect(); err != nil {
-		log.Fatal(err)
-	}
-	// Fiber instace
+	// clear cmd
+	c := exec.Command("clear")
+	c.Stdout = os.Stdout
+	c.Run()
+
+	// Instantiate fiber app
 	app := fiber.New()
 
-	// Middleware
-	app.Use(middleware.Logger())
+	// Routeing
+	app.Get("/", func(c *fiber.Ctx) {
+		c.Send("Hello")
+	})
 
-	router.SetupRoutes(app)
+	app.Use(notFound)
 
-	// start server
+	// Create server
 	app.Listen(3000)
+}
+
+func notFound(c *fiber.Ctx) {
+	c.SendStatus(404)
 }
