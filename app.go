@@ -1,11 +1,14 @@
 package main
 
 import (
+	"log"
 	"os"
 	"os/exec"
 
-	"github.com/gofiber/fiber"
+	fiber "github.com/gofiber/fiber/v2"
 )
+
+const port = ":3000"
 
 func main() {
 
@@ -18,16 +21,22 @@ func main() {
 	app := fiber.New()
 
 	// Routeing
-	app.Get("/", func(c *fiber.Ctx) {
-		c.Send("Hello")
+	app.Get("/", func(c *fiber.Ctx) error {
+		return c.SendString("Hello World")
 	})
+
+	app.Get("/users", getUsers)
 
 	app.Use(notFound)
 
 	// Create server
-	app.Listen(3000)
+	log.Fatal(app.Listen(port))
 }
 
-func notFound(c *fiber.Ctx) {
-	c.SendStatus(404)
+func getUsers(c *fiber.Ctx) error {
+	return c.SendString("All users!")
+}
+
+func notFound(c *fiber.Ctx) error {
+	return c.SendStatus(404)
 }
